@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coach David | Tu coach financiero</title>
+  <meta name="description" content="Coach David: ahorra, cumple tu meta y construye mejores hábitos financieros.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+/* ---------- Colores y tamaños base ---------- */
+:root {
+  --verde: #22a45d;
+  --verde-oscuro: #178048;
+  --verde-claro: #e6f6ed;
+  --fondo: #f4f8f5;
+  --blanco: #ffffff;
+  --gris: #eef1ef;
+  --gris-texto: #6b7770;
+  --texto: #1d2b23;
+  --radio: 20px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Siempre tema claro, para que el texto se vea */
+html { color-scheme: light; }
+
+input::placeholder { color: #9aa5a0; }
+
+body {
+  background-image: radial-gradient(900px 420px at 50% -120px, #d4f0df, transparent);
+  background-repeat: no-repeat;
+  font-family: "Nunito", system-ui, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  line-height: 1.5;
+}
+
+/* Contenedor central: en PC se ve angosto y ordenado, en celular ocupa todo */
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ---------- Saludo ---------- */
+.logo { color: var(--verde-oscuro); font-weight: 800; margin-bottom: 6px; }
+h1 { font-size: 2rem; font-weight: 800; }
+.consejo {
+  margin-top: 8px;
+  font-size: 1.1rem;
+  color: var(--gris-texto);
+}
+
+/* ---------- Tres bloques en fila ---------- */
+.bloques {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
+.columna { display: flex; flex-direction: column; gap: 20px; }
+.columna .tarjeta:last-child { flex: 1; }
+
+/* ---------- Tarjetas ---------- */
+.tarjeta {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  padding: 24px;
+  box-shadow: 0 4px 18px rgba(30, 80, 50, 0.07);
+}
+h2 { font-size: 1.2rem; margin-bottom: 20px; }
+h3 { font-size: 1.15rem; margin-bottom: 12px; }
+
+/* ---------- Formularios ---------- */
+label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gris-texto);
+  margin-bottom: 6px;
+}
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font: inherit;
+  color: var(--texto);
+  background: var(--gris);
+  border: 2px solid transparent;
+  border-radius: 12px;
+}
+input[type="text"]:focus,
+input[type="number"]:focus {
+  outline: none;
+  border-color: var(--verde);
+  background: var(--blanco);
+}
+.fila { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.boton {
+  background: var(--verde);
+  color: var(--blanco);
+  border: none;
+  padding: 12px 22px;
+  font: inherit;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.boton:hover { background: var(--verde-oscuro); }
+
+/* ---------- Resumen de la meta ---------- */
+.resumen {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 2px solid var(--gris);
+}
+.datos { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-bottom: 18px; color: var(--gris-texto); }
+.datos strong { display: block; color: var(--texto); font-size: 1.1rem; }
+
+.barra { height: 14px; background: var(--gris); border-radius: 99px; overflow: hidden; }
+.barra-relleno {
+  height: 100%;
+  width: 0;
+  background: var(--verde);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+.porcentaje { margin-top: 8px; font-weight: 800; color: var(--verde-oscuro); }
+
+/* ---------- Coach ---------- */
+.coach { background: var(--verde-claro); }
+.coach p { font-size: 1.1rem; font-weight: 600; color: var(--verde-oscuro); }
+
+/* ---------- Simulador y compromiso ---------- */
+.resultado { margin-top: 18px; font-weight: 700; color: var(--verde-oscuro); }
+
+.compromiso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 14px;
+  background: var(--gris);
+  border-radius: 12px;
+  font-size: 1rem;
+  color: var(--texto);
+  cursor: pointer;
+}
+.compromiso input { width: 20px; height: 20px; accent-color: var(--verde); }
+.compromiso.hecho span { text-decoration: line-through; color: var(--gris-texto); }
+
+.oculto { display: none; }
+
+/* ---------- Tablet y celular: los bloques se apilan ---------- */
+@media (max-width: 900px) {
+  .bloques { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .fila { grid-template-columns: 1fr; gap: 0; }
+  .tarjeta { padding: 22px; }
+  h1 { font-size: 2rem; }
+}
+
+/* ---------- Acabado profesional ---------- */
+.logo {
+  display: inline-block;
+  background: var(--verde-claro);
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); letter-spacing: -0.03em; line-height: 1.05; }
+.consejo { max-width: 560px; }
+
+.tarjeta {
+  border: 1px solid rgba(34, 164, 93, 0.08);
+  box-shadow: 0 1px 2px rgba(20, 60, 40, 0.04), 0 12px 32px rgba(20, 60, 40, 0.07);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: subir 0.7s ease both;
+}
+.tarjeta:hover { transform: translateY(-4px); box-shadow: 0 2px 4px rgba(20, 60, 40, 0.05), 0 20px 44px rgba(20, 60, 40, 0.11); }
+.bloques > *:nth-child(2) { animation-delay: 0.12s; }
+.bloques > *:nth-child(3) { animation-delay: 0.24s; }
+.saludo { animation: subir 0.7s ease both; }
+
+.barra-relleno { background: linear-gradient(90deg, #22a45d, #5fd391); }
+.boton { transition: transform 0.2s ease, background 0.2s ease; }
+.boton:hover { transform: translateY(-2px); }
+.boton:active { transform: translateY(0); }
+
+@keyframes subir {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta, .saludo { animation: none; }
+}
+
+</style>
+</head>
+<body>
+  <main class="app">
+
+    <!-- 1. SALUDO Y CONSEJO -->
+    <header class="saludo">
+      <p class="logo">🌱 Coach David</p>
+      <h1>Hola 👋</h1>
+      <p id="consejo" class="consejo"></p>
+    </header>
+
+    <div class="bloques">
+
+    <!-- BLOQUE 1: MI META -->
+    <section class="tarjeta">
+      <h2>🎯 Mi meta</h2>
+
+      <div class="formulario">
+        <label for="nombreMeta">Nombre de la meta</label>
+        <input type="text" id="nombreMeta" placeholder="Ej: Viaje a Medellín">
+
+        <div class="fila">
+          <div>
+            <label for="valorMeta">Valor que necesito ($)</label>
+            <input type="number" id="valorMeta" min="0" placeholder="1000000">
+          </div>
+          <div>
+            <label for="ahorrado">Ya tengo ahorrado ($)</label>
+            <input type="number" id="ahorrado" min="0" placeholder="350000">
+          </div>
+        </div>
+
+        <button id="btnGuardarMeta" class="boton">Guardar meta</button>
+      </div>
+
+      <div id="resumenMeta" class="resumen oculto">
+        <h3 id="resNombre"></h3>
+        <div class="datos">
+          <p>Meta <strong id="resValor"></strong></p>
+          <p>Ahorrado <strong id="resAhorrado"></strong></p>
+          <p>Falta <strong id="resFalta"></strong></p>
+        </div>
+        <div class="barra">
+          <div id="barraRelleno" class="barra-relleno"></div>
+        </div>
+        <p id="resPorcentaje" class="porcentaje"></p>
+      </div>
+    </section>
+
+    <!-- BLOQUE 2: COACH + SIMULADOR -->
+    <div class="columna">
+
+    <!-- COACH FINANCIERO -->
+    <section class="tarjeta coach">
+      <h2>💬 Tu coach</h2>
+      <p id="mensajeCoach">Escribe tu meta para recibir un consejo.</p>
+    </section>
+
+    <!-- SIMULADOR -->
+    <section class="tarjeta">
+      <h2>🧮 Simulador</h2>
+      <label for="ahorroMensual">¿Cuánto puedes ahorrar al mes? ($)</label>
+      <input type="number" id="ahorroMensual" min="0" placeholder="200000">
+      <button id="btnSimular" class="boton">Calcular</button>
+      <p id="resultadoSimulador" class="resultado"></p>
+    </section>
+
+    </div>
+
+    <!-- BLOQUE 3: RECORDATORIO -->
+    <section class="tarjeta">
+      <h2>⏰ Mi próximo compromiso</h2>
+      <input type="text" id="textoCompromiso" placeholder="Ej: Ahorrar $50.000 esta semana">
+      <button id="btnGuardarCompromiso" class="boton">Guardar compromiso</button>
+
+      <label id="zonaCompromiso" class="compromiso oculto">
+        <input type="checkbox" id="checkCompromiso">
+        <span id="compromisoGuardado"></span>
+      </label>
+    </section>
+
+    </div>
+
+  </main>
+
+  <script>
+// ===== 1. CONSEJO ALEATORIO =====
+const consejos = [
+  "Ahorrar poco todos los días puede ayudarte a alcanzar grandes metas.",
+  "Antes de comprar algo, espera 24 horas. Muchas veces ya no lo querrás.",
+  "Ahorra primero y gasta después con lo que te quede.",
+  "Anotar tus gastos te ayuda a ver en qué se va tu dinero.",
+  "Una meta clara es más fácil de cumplir que un ahorro sin propósito."
+];
+const indice = Math.floor(Math.random() * consejos.length);
+document.getElementById("consejo").textContent = consejos[indice];
+
+// ===== Funciones de ayuda =====
+// Muestra un número como dinero: 1000000 -> $1.000.000
+function formatoDinero(numero) {
+  return "$" + numero.toLocaleString("es-CO");
+}
+
+// ===== 2. MI META =====
+const inputNombre = document.getElementById("nombreMeta");
+const inputValor = document.getElementById("valorMeta");
+const inputAhorrado = document.getElementById("ahorrado");
+
+// Leemos la meta guardada (si no hay, queda como null)
+let meta = JSON.parse(localStorage.getItem("fincoachMeta"));
+
+function guardarMeta() {
+  meta = {
+    nombre: inputNombre.value.trim() || "Mi meta",
+    valor: Number(inputValor.value),
+    ahorrado: Number(inputAhorrado.value)
+  };
+  localStorage.setItem("fincoachMeta", JSON.stringify(meta));
+  mostrarMeta();
+}
+
+function mostrarMeta() {
+  if (!meta || meta.valor <= 0) return;
+
+  // Cálculos principales
+  const porcentaje = Math.min(100, Math.round((meta.ahorrado / meta.valor) * 100));
+  const falta = Math.max(0, meta.valor - meta.ahorrado);
+
+  // Mostrar en pantalla
+  document.getElementById("resumenMeta").classList.remove("oculto");
+  document.getElementById("resNombre").textContent = meta.nombre;
+  document.getElementById("resValor").textContent = formatoDinero(meta.valor);
+  document.getElementById("resAhorrado").textContent = formatoDinero(meta.ahorrado);
+  document.getElementById("resFalta").textContent = formatoDinero(falta);
+  document.getElementById("barraRelleno").style.width = porcentaje + "%";
+  document.getElementById("resPorcentaje").textContent = porcentaje + "% completado";
+
+  mostrarCoach(porcentaje);
+}
+
+// Al cargar la página, rellenamos los campos con lo guardado
+if (meta) {
+  inputNombre.value = meta.nombre;
+  inputValor.value = meta.valor;
+  inputAhorrado.value = meta.ahorrado;
+  mostrarMeta();
+}
+
+document.getElementById("btnGuardarMeta").addEventListener("click", guardarMeta);
+
+// ===== 3. COACH FINANCIERO =====
+function mostrarCoach(porcentaje) {
+  let mensaje;
+
+  if (porcentaje >= 100) {
+    mensaje = "🎉 ¡Meta cumplida! Excelente trabajo.";
+  } else if (porcentaje >= 75) {
+    mensaje = "¡Ya casi! Evita gastos innecesarios durante estos días para alcanzar tu objetivo.";
+  } else if (porcentaje >= 25) {
+    mensaje = "¡Vas bien! Mantén este hábito y estarás más cerca de tu meta.";
+  } else {
+    mensaje = "Vas comenzando. Intenta separar una pequeña cantidad cada semana.";
+  }
+
+  document.getElementById("mensajeCoach").textContent = mensaje;
+}
+
+// ===== 4. SIMULADOR =====
+document.getElementById("btnSimular").addEventListener("click", function () {
+  const resultado = document.getElementById("resultadoSimulador");
+  const mensual = Number(document.getElementById("ahorroMensual").value);
+
+  if (!meta || meta.valor <= 0) {
+    resultado.textContent = "Primero guarda tu meta.";
+    return;
+  }
+  if (mensual <= 0) {
+    resultado.textContent = "Escribe cuánto puedes ahorrar al mes.";
+    return;
+  }
+
+  const falta = Math.max(0, meta.valor - meta.ahorrado);
+
+  if (falta === 0) {
+    resultado.textContent = "🎉 ¡Ya cumpliste tu meta!";
+    return;
+  }
+
+  // Meses = lo que falta / lo que ahorro al mes (redondeado hacia arriba)
+  const meses = Math.ceil(falta / mensual);
+  resultado.textContent = "Tiempo estimado: " + meses + (meses === 1 ? " mes" : " meses");
+});
+
+// ===== 5. RECORDATORIO =====
+const inputCompromiso = document.getElementById("textoCompromiso");
+const check = document.getElementById("checkCompromiso");
+const zona = document.getElementById("zonaCompromiso");
+
+let compromiso = JSON.parse(localStorage.getItem("fincoachCompromiso"));
+
+function mostrarCompromiso() {
+  if (!compromiso) return;
+  zona.classList.remove("oculto");
+  document.getElementById("compromisoGuardado").textContent = compromiso.texto;
+  check.checked = compromiso.hecho;
+  zona.classList.toggle("hecho", compromiso.hecho);
+}
+
+document.getElementById("btnGuardarCompromiso").addEventListener("click", function () {
+  const texto = inputCompromiso.value.trim();
+  if (texto === "") return;
+  compromiso = { texto: texto, hecho: false };
+  localStorage.setItem("fincoachCompromiso", JSON.stringify(compromiso));
+  inputCompromiso.value = "";
+  mostrarCompromiso();
+});
+
+check.addEventListener("change", function () {
+  compromiso.hecho = check.checked;
+  localStorage.setItem("fincoachCompromiso", JSON.stringify(compromiso));
+  mostrarCompromiso();
+});
+
+mostrarCompromiso();
+
+</script>
+</body>
+</html>

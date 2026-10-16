@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bitácora de gastos</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f8f5;--tx:#1d2b23;--mut:#6b7770;--gr:#eef1ef;--v:#22a45d}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:Nunito,system-ui,sans-serif;color-scheme:light}
+.deck{height:100%;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;padding:32px 6vw 96px;overflow-y:auto;opacity:0;transform:translateX(40px);pointer-events:none;transition:.4s}
+.slide.on{opacity:1;transform:none;pointer-events:auto}
+.in{margin:auto;width:100%;max-width:980px}
+h1{font-size:clamp(2.2rem,6vw,4rem);font-weight:800;line-height:1.1}
+h2{font-size:clamp(1.3rem,3vw,1.9rem);font-weight:800;margin:4px 0 22px}
+.tag{font-weight:800;font-size:1.1rem}
+.mut,small{color:var(--mut)}
+.g{display:grid;grid-template-columns:1.6fr 1fr;gap:24px;align-items:start}
+.item{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:14px;padding:11px 16px;margin-bottom:8px;box-shadow:0 2px 10px rgba(30,80,50,.06)}
+.item b{margin-right:10px}
+.item button{border:0;background:var(--gr);color:var(--mut);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:1rem}
+.item button:hover{background:#fbdcd7;color:#c0392b}
+.f{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.f input{flex:1;min-width:110px;padding:11px 13px;border:2px solid transparent;background:#fff;color:var(--tx);border-radius:12px;font:inherit}
+.f input:focus{outline:0;border-color:var(--c)}
+.f button,.btn{border:0;color:#fff;background:var(--v);padding:11px 20px;border-radius:12px;font:inherit;font-weight:700;cursor:pointer}
+.tot{background:#fff;border-radius:20px;padding:26px;box-shadow:0 4px 18px rgba(30,80,50,.08)}
+.tot strong{display:block;font-size:2rem;font-weight:800;color:var(--c);margin:4px 0 14px}
+.bar{height:12px;background:var(--gr);border-radius:9px;overflow:hidden;margin-bottom:8px}
+.bar i{display:block;height:100%;background:var(--c);border-radius:9px;transition:width .5s}
+.big{font-size:clamp(2rem,5vw,3rem);font-weight:800;color:var(--v);margin:18px 0 26px}
+.res{display:flex;gap:32px;align-items:center;flex-wrap:wrap}
+.donut{width:200px;height:200px;border-radius:50%;display:grid;place-items:center;flex:none}
+.donut div{width:120px;height:120px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-weight:800;text-align:center;font-size:.9rem}
+.leg p{margin:8px 0;font-weight:700}.leg i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px}
+.sim{background:#fff;border-radius:20px;padding:22px;margin-top:26px}
+.sim input{width:100%;accent-color:var(--v);margin:10px 0}
+nav{position:fixed;left:0;right:0;bottom:0;padding:14px 20px calc(14px + env(safe-area-inset-bottom));display:flex;justify-content:center;align-items:center;gap:18px;background:linear-gradient(transparent,var(--bg) 40%)}
+nav button.a{width:42px;height:42px;border-radius:50%;border:0;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.1);cursor:pointer;font-size:1.1rem}
+nav button:disabled{opacity:.3;cursor:default}
+.dots{display:flex;gap:8px}.dots button{width:10px;height:10px;border-radius:9px;border:0;background:#c9d3cd;cursor:pointer;padding:0;transition:.3s}
+.dots button.on{width:28px;background:var(--v)}
+@media(max-width:800px){.g{grid-template-columns:1fr}}
+</style></head><body>
+<div class="deck" id="deck"></div>
+<nav><button class="a" id="pv" onclick="go(i-1)" aria-label="Anterior">←</button><div class="dots" id="dots"></div><button class="a" id="nx" onclick="go(i+1)" aria-label="Siguiente">→</button></nav>
+<script>
+let cats=[
+{n:'Necesarios',e:'🏠',c:'#22a45d',d:'Lo que no se puede dejar de pagar',it:[['Gasolina de la moto',120000],['Parqueadero (mensualidad)',180000],['Plan del celular',59000],['Mercado',450000],['Servicios (agua, luz, gas, internet)',210000],['Comida de Sheriff 🐕',90000]]},
+{n:'Opcionales',e:'🎬',c:'#e8a317',d:'Gustos que disfruto y puedo ajustar',it:[['Salidas a comer',150000],['Streaming (Netflix y Spotify)',52000],['Cine y planes con amigos',60000],['Ropa y accesorios',120000]]},
+{n:'Innecesarios',e:'🛍️',c:'#e5604d',d:'Gastos que realmente no hacen falta',it:[['Domicilios por antojo',85000],['Compras online impulsivas',110000],['Apps y juegos',30000],['Café y snacks diarios',70000]]}];
+try{const s=JSON.parse(localStorage.getItem('bitacora'));if(s)cats.forEach((c,k)=>c.it=s[k])}catch(e){}
+const fmt=n=>'$'+n.toLocaleString('es-CO'),sum=k=>cats[k].it.reduce((a,x)=>a+x[1],0),tot=()=>sum(0)+sum(1)+sum(2);
+let i=0,cut=50;
+const save=()=>{try{localStorage.setItem('bitacora',JSON.stringify(cats.map(c=>c.it)))}catch(e){}};
+function cat(k){const c=cats[k],t=sum(k),T=tot(),p=T?Math.round(t/T*100):0;
+return `<section class="slide"><div class="in"><p class="tag" style="color:${c.c}">${c.e} ${c.n}</p><h2>${c.d}</h2><div class="g"><div>${c.it.map((x,j)=>`<div class="item"><span>${x[0]}</span><span><b>${fmt(x[1])}</b><button onclick="del(${k},${j})" aria-label="Borrar">×</button></span></div>`).join('')}<form class="f" style="--c:${c.c}" onsubmit="return add(event,${k})"><input name="n" placeholder="Nuevo gasto" required><input name="v" type="number" min="1" placeholder="Valor" required><button style="background:${c.c}">Añadir</button></form></div><div class="tot" style="--c:${c.c}"><small>Total del bloque</small><strong>${fmt(t)}</strong><div class="bar"><i style="width:${p}%"></i></div><small>${p}% de todos tus gastos</small></div></div></div></section>`}
+function upd(){const a=sum(2)*cut/100;document.getElementById('cv').textContent=cut+'%';document.getElementById('sv').innerHTML=`Ahorrarías <b>${fmt(Math.round(a))}</b> al mes y <b>${fmt(Math.round(a*12))}</b> al año`}
+function render(){const T=tot(),a=sum(0)/T*100||0,b=a+sum(1)/T*100||0,co=cats.map(c=>c.c);
+document.getElementById('deck').innerHTML=
+`<section class="slide"><div class="in"><p class="tag" style="color:var(--v)">🌱 Mi bitácora</p><h1>Bitácora<br>de gastos</h1><p class="mut" style="margin-top:12px">Mi mes en tres bloques</p><p class="big">${fmt(T)}</p><button class="btn" onclick="go(1)">Empezar →</button></div></section>`
++cat(0)+cat(1)+cat(2)+
+`<section class="slide"><div class="in"><p class="tag" style="color:var(--v)">📊 Resumen</p><h2>¿A dónde se va mi dinero?</h2><div class="res"><div class="donut" style="background:conic-gradient(${co[0]} 0 ${a}%,${co[1]} ${a}% ${b}%,${co[2]} ${b}% 100%)"><div>${fmt(T)}<br>al mes</div></div><div class="leg">${cats.map((c,k)=>`<p><i style="background:${c.c}"></i>${c.n}: ${fmt(sum(k))} (${Math.round(sum(k)/T*100)||0}%)</p>`).join('')}</div></div><div class="sim"><b>🧮 ¿Y si recorto los innecesarios?</b><input type="range" min="0" max="100" value="${cut}" oninput="cut=+this.value;upd()"><p>Recorte: <b id="cv"></b></p><p id="sv" style="color:var(--v);font-size:1.2rem;margin-top:6px"></p></div></div></section>`;
+upd();go(i)}
+function go(n){i=Math.max(0,Math.min(4,n));document.querySelectorAll('.slide').forEach((s,j)=>s.classList.toggle('on',j==i));document.querySelectorAll('.dots button').forEach((d,j)=>d.classList.toggle('on',j==i));pv.disabled=i==0;nx.disabled=i==4}
+function add(e,k){e.preventDefault();const f=e.target;cats[k].it.push([f.n.value.trim(),+f.v.value]);save();render();document.querySelectorAll('.f input')[(k-0)*2].focus();return false}
+function del(k,j){cats[k].it.splice(j,1);save();render()}
+dots.innerHTML=[0,1,2,3,4].map(n=>`<button onclick="go(${n})" aria-label="Diapositiva ${n+1}"></button>`).join('');
+addEventListener('keydown',e=>{if(/INPUT/.test(e.target.tagName))return;if(e.key=='ArrowRight')go(i+1);if(e.key=='ArrowLeft')go(i-1)});
+let x0;addEventListener('touchstart',e=>x0=e.touches[0].clientX);addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>70&&!/INPUT/.test(e.target.tagName))go(i+(d<0?1:-1))});
+render();
+</script></body></html>
